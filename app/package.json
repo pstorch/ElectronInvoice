@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "main.js",
   "dependencies": {
+    "mysql": "^2.10.0",
     "sqlite3": "^3.1.1"
   }
 }

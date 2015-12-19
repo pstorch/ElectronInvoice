@@ -1,9 +1,19 @@
 (function () {
     'use strict';
-    var sqlite3 = require('sqlite3');
+    var mysql = require('mysql');
+
+    // Creates MySql database connection
+    var connection = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "password",
+        database: "customer_manager"
+    });
+
+    //var sqlite3 = require('sqlite3');
 
     // Creates sqlite3 database connection
-    var connection = new sqlite3.Database(':memory:');
+    //var connection = new sqlite3.Database(':memory:');
 
     angular.module('app')
         .service('customerService', ['$q', CustomerService]);
