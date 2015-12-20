@@ -1,19 +1,36 @@
 (function () {
     'use strict';
-    var mysql = require('mysql');
+    //var mysql = require('mysql');
 
     // Creates MySql database connection
-    var connection = mysql.createConnection({
+    /*var connection = mysql.createConnection({
         host: "localhost",
         user: "root",
         password: "password",
         database: "customer_manager"
-    });
+    });*/
 
-    //var sqlite3 = require('sqlite3');
+    var fs = require("fs");
+    var file = "electron-invoice.db";
+    var exists = fs.existsSync(file);
+
+    var sqlite3 = require('sqlite3').verbose();
 
     // Creates sqlite3 database connection
-    //var connection = new sqlite3.Database(':memory:');
+    var db = new sqlite3.Database(file);
+
+    db.serialize(function() {
+    if(!exists) {
+        db.run("CREATE TABLE customers ( " +
+              "customer_id INT NOT NULL AUTO_INCREMENT, " +
+              "name VARCHAR(45) NOT NULL, " +
+              "street VARCHAR(45) NULL, " +
+              "address VARCHAR(450) NULL, " +
+              "city VARCHAR(45) NULL, " +
+              "PRIMARY KEY (customer_id) " +
+              "); ");
+      }
+    });
 
     angular.module('app')
         .service('customerService', ['$q', CustomerService]);
