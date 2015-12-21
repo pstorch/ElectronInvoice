@@ -4,6 +4,6 @@
   "main": "main.js",
   "dependencies": {
     "mysql": "^2.10.0",
-    "sqlite3": "3.0.10"
+    "sqlite3": "https://github.com/mapbox/node-sqlite3/tarball/master"
   }
 }

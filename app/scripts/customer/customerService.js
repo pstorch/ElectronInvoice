@@ -14,22 +14,24 @@
     var file = "electron-invoice.db";
     var exists = fs.existsSync(file);
 
+    if(!exists) {
+      console.log("Creating DB file.");
+      fs.openSync(file, "w");
+    }
+
     var sqlite3 = require('sqlite3').verbose();
 
     // Creates sqlite3 database connection
     var db = new sqlite3.Database(file);
 
     db.serialize(function() {
-    if(!exists) {
-        db.run("CREATE TABLE customers ( " +
-              "customer_id INT NOT NULL AUTO_INCREMENT, " +
-              "name VARCHAR(45) NOT NULL, " +
-              "street VARCHAR(45) NULL, " +
-              "address VARCHAR(450) NULL, " +
-              "city VARCHAR(45) NULL, " +
-              "PRIMARY KEY (customer_id) " +
+        db.run("CREATE TABLE IF NOT EXISTS customers ( " +
+              "customer_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+              "name TEXT NOT NULL, " +
+              "street TEXT NULL, " +
+              "address TEXT NULL, " +
+              "city TEXT NULL " +
               "); ");
-      }
     });
 
     angular.module('app')
@@ -48,7 +50,7 @@
         function getCustomers() {
             var deferred = $q.defer();
             var query = "SELECT * FROM customers";
-            connection.query(query, function (err, rows) {
+            db.each(query, function (err, rows) {
                 if (err) deferred.reject(err);
                 deferred.resolve(rows);
             });
@@ -58,7 +60,7 @@
         function getCustomerById(id) {
             var deferred = $q.defer();
             var query = "SELECT * FROM customers WHERE customer_id = ?";
-            connection.query(query, [id], function (err, rows) {
+            db.each(query, [id], function (err, rows) {
                 if (err) deferred.reject(err);
                 deferred.resolve(rows);
             });
@@ -67,8 +69,9 @@
 
         function getCustomerByName(name) {
             var deferred = $q.defer();
-            var query = "SELECT * FROM customers WHERE name LIKE  '" + name + "%'";
-            connection.query(query, [name], function (err, rows) {
+            var likeName = "%" + name + "%";
+            var query = "SELECT * FROM customers WHERE name LIKE ?";
+            db.each(query, [likeName], function (err, rows) {
                 console.log(err)
                 if (err) deferred.reject(err);
 
@@ -80,11 +83,11 @@
         function createCustomer(customer) {
             var deferred = $q.defer();
             var query = "INSERT INTO customers SET ?";
-            connection.query(query, customer, function (err, res) {
+            db.run(query, customer, function (err, res) {
                 console.log(err)
                 if (err) deferred.reject(err);
                 console.log(res)
-                deferred.resolve(res.insertId);
+                deferred.resolve(res.lastID);
             });
             return deferred.promise;
         }
@@ -92,7 +95,7 @@
         function deleteCustomer(id) {
             var deferred = $q.defer();
             var query = "DELETE FROM customers WHERE customer_id = ?";
-            connection.query(query, [id], function (err, res) {
+            db.run(query, [id], function (err, res) {
                 if (err) deferred.reject(err);
                 console.log(res);
                 deferred.resolve(res.affectedRows);
@@ -103,7 +106,7 @@
         function updateCustomer(customer) {
             var deferred = $q.defer();
             var query = "UPDATE customers SET name = ? WHERE customer_id = ?";
-            connection.query(query, [customer.name, customer.customer_id], function (err, res) {
+            db.run(query, [customer.name, customer.customer_id], function (err, res) {
                 if (err) deferred.reject(err);
                 deferred.resolve(res);
             });

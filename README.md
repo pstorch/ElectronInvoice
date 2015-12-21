@@ -5,3 +5,4 @@ A simple Invoice application to learn Atoms Electron
 - https://github.com/atom/electron-quick-start
 - https://scotch.io/tutorials/creating-desktop-applications-with-angularjs-and-github-electron
 - http://blog.modulus.io/nodejs-and-sqlite
+- https://github.com/mapbox/node-sqlite3/wiki/API

@@ -59,7 +59,6 @@
                 });
             }
             else {
-                //self.selected.customer_id = new Date().getSeconds();
                 customerService.create(self.selected).then(function (affectedRows) {
                     $mdDialog.show(
                         $mdDialog
