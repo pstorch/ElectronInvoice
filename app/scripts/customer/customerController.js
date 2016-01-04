@@ -38,15 +38,15 @@
 
 
             $mdDialog.show(confirm).then(function () {
-                customerService.destroy(self.selected.customer_id).then(function (affectedRows) {
+                customerService.destroy(self.selected.id).then(function (affectedRows) {
                     self.customers.splice(self.selectedIndex, 1);
                 });
             }, function () { });
         }
 
         function saveCustomer($event) {
-            if (self.selected != null && self.selected.customer_id != null) {
-                customerService.update(self.selected).then(function (affectedRows) {
+            if (self.selected != null && self.selected.id != null) {
+                self.selected.save().then(function (affectedRows) {
                     $mdDialog.show(
                         $mdDialog
                             .alert()
@@ -59,7 +59,12 @@
                 });
             }
             else {
-                customerService.create(self.selected).then(function (affectedRows) {
+              Customer
+                .create({ name1: self.selected.name1, name2: self.selected.name2, street: self.selected.street, city: self.selected.city})
+                .then(function(customer) {
+                    self.selected = customer;
+                    self.customers.concat(customer);
+                    console.log("Added customer " + user.get({plain: true}));
                     $mdDialog.show(
                         $mdDialog
                             .alert()
@@ -79,10 +84,12 @@
         }
 
         function getAllCustomers() {
-            customerService.getCustomers().then(function (customers) {
-                self.customers = [].concat(customers);
-                self.selected = customers[0];
-            });
+          // find multiple entries
+          Customer.findAll({ include: [{ all: true }]}).then(function(customers) {
+            // customers will be an array of all Customer instances
+            self.customers = [].concat(customers);
+            self.selected = customers[0];
+          })
         }
 
         function filterCustomer() {
